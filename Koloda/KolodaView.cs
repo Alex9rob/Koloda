@@ -227,7 +227,7 @@ namespace Koloda
                     }
                     else
                     {
-                        InsertSubview(nextCardView, index - 1);
+                        InsertSubviewBelow(nextCardView, visibleCards[index - 1]);
                     }
                 }
 
@@ -571,8 +571,8 @@ namespace Koloda
 
             if (visibleCards.Count != 0)
             {
-                var lastIndex = visibleCards.Count - 1;
-                InsertSubview(lastCard, lastIndex);
+                var card = visibleCards[visibleCards.Count - 1];
+                InsertSubviewBelow(lastCard, card);
             }
             else
             {
@@ -708,11 +708,11 @@ namespace Koloda
                 LayoutCard(nextCardView, currentCardIndex + index);
                 nextCardView.Alpha = shouldTransparentizeNextCard ? alphaValueSemiTransparent : alphaValueOpaque;
 
-                visibleCards.Append(nextCardView);
+                visibleCards.Add(nextCardView);
                 this.ConfigureCard(nextCardView, currentCardIndex + index);
                 if (index > 0)
                 {
-                    InsertSubview(nextCardView, index - 1);
+                    InsertSubviewBelow(nextCardView, visibleCards[index - 1]);
                 }
                 else
                 {
@@ -869,7 +869,7 @@ namespace Koloda
                 {
                     card.UserInteractionEnabled = false;
                     card.Alpha = shouldTransparentizeNextCard ? alphaValueSemiTransparent : alphaValueOpaque;
-                    InsertSubview(card, visibleCardIndex - 1);
+                    InsertSubviewBelow(card, visibleCards[visibleCardIndex - 1]);
                 }
 
                 LayoutCard(card, visibleCardIndex);
@@ -896,10 +896,10 @@ namespace Koloda
             {
                 animator.applyRemovalAnimation(
                     cards,
-                    (() =>
+                    () =>
                     {
                         removeCards(cards);
-                    }));
+                    });
             }
             else
             {
@@ -909,9 +909,10 @@ namespace Koloda
 
         public void insertCardAtIndexRange(List<int> indexRange, bool animated = true)
         {
-            // guard let dataSource = dataSource else {
-            //     return
-            // }
+            if(dataSource == null)
+            {
+                return;
+            }
 
             var currentItemsCount = countOfCards;
             countOfCards = dataSource.kolodaNumberOfCards(this);

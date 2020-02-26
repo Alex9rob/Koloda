@@ -14,15 +14,6 @@ namespace KolodaXamarin
         {
         }
 
-        private List<UIImage> dataSource = new List<UIImage>
-        {
-            UIImage.FromBundle("Card_like_1"),
-            UIImage.FromBundle("Card_like_2"),
-            UIImage.FromBundle("Card_like_3"),
-            UIImage.FromBundle("Card_like_4"),
-            UIImage.FromBundle("Card_like_5")
-        };
-
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
@@ -51,61 +42,29 @@ namespace KolodaXamarin
         {
             base.ViewDidLoad();
             // Perform any additional setup after loading the view, typically from a nib.
-            View.BackgroundColor = UIColor.Red;
-            _kolodaView.BackgroundColor = UIColor.Blue;
+            View.BackgroundColor = UIColor.Gray;
+            _kolodaView.BackgroundColor = UIColor.LightGray;
             _kolodaView.dataSource = this;
             _kolodaView.@delegate = this;
 
             ModalTransitionStyle = UIModalTransitionStyle.FlipHorizontal;
         }
 
-        // MARK: IBActions
-        //@IBAction func leftButtonTapped()
-        //{
-        //    kolodaView?.swipe(.left)
-        //}
-
-        //@IBAction func rightButtonTapped()
-        //{
-        //    kolodaView?.swipe(.right)
-        //}
-
-        //@IBAction func undoButtonTapped()
-        //{
-        //    kolodaView?.revertAction()
-        //}
-
         // MARK: KolodaViewDelegate
 
         void IKolodaViewDelegate.kolodaDidRunOutOfCards(KolodaView koloda)
         {
-            var position = _kolodaView.currentCardIndex;
-            dataSource.AddRange(new List<UIImage>
-        {
-            UIImage.FromBundle("Card_like_1"),
-            UIImage.FromBundle("Card_like_2"),
-            UIImage.FromBundle("Card_like_3"),
-            UIImage.FromBundle("Card_like_4"),
-            UIImage.FromBundle("Card_like_5")
-        });
-
-            var indexRange = new List<int>();
-            for (int i = position; i < position + 3; i++)
-            {
-                indexRange.Add(i);
-            }
-            _kolodaView.insertCardAtIndexRange(indexRange, animated: true);
         }
 
         void IKolodaViewDelegate.kolodaDidSelectCardAt(KolodaView koloda, int index)
         {
             UIApplication.SharedApplication.OpenUrl(new NSUrl("https://yalantis.com/"));
         }
-               
+
         // MARK: KolodaViewDataSource
         int IKolodaViewDataSource.kolodaNumberOfCards(KolodaView koloda)
         {
-            return dataSource.Count;
+            return 7;
         }
 
         DragSpeed IKolodaViewDataSource.kolodaSpeedThatCardShouldDrag(KolodaView koloda)
@@ -115,13 +74,53 @@ namespace KolodaXamarin
 
         UIView IKolodaViewDataSource.kolodaViewForCardAt(KolodaView koloda, int index)
         {
-            return new UIImageView(dataSource[index]);
+            if (index % 2 != 0)
+            {
+                var view = new UIView();
+                view.BackgroundColor = GetUIColor(index);
+                return view;
+            }
+            else
+            {
+                return GetUIImageView(index);
+            }          
         }
 
-
-        OverlayView IKolodaViewDataSource.kolodaViewForCardOverlayAt(KolodaView koloda, int index)
+        OverlayView IKolodaViewDataSource.kolodaViewForCardOverlayAt(KolodaView koloa, int index)
         {
             return new OverlayView();
+            //return NSBundle.MainBundle.LoadNib("OverlayView", this, null).GetItem<OverlayView>(0);            
+        }
+
+        private UIColor GetUIColor(int index)
+        {
+            var colors = new List<UIColor>
+            {
+                UIColor.Red,
+                UIColor.Orange,
+                UIColor.Yellow,
+                UIColor.Green,
+                UIColor.Cyan,
+                UIColor.Blue,
+                UIColor.Purple
+            };
+            index = index % colors.Count;
+
+            return colors[index];
+        }
+
+        private UIImageView GetUIImageView(int index)
+        {
+            var images = new List<UIImage>
+            {
+                UIImage.FromBundle("Card_like_1"),
+                UIImage.FromBundle("Card_like_2"),
+                UIImage.FromBundle("Card_like_3"),
+                UIImage.FromBundle("Card_like_4"),
+                UIImage.FromBundle("Card_like_5")
+            };
+            index = index % images.Count;
+            return new UIImageView(images[index]);
         }
     }
 }

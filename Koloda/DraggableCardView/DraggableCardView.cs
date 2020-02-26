@@ -147,7 +147,7 @@ namespace Koloda.DraggableCardView
         // }
 
         private void Setup()
-        {
+        {      
             panGestureRecognizer = new UIPanGestureRecognizer(PanGestureRecognized);
             AddGestureRecognizer(panGestureRecognizer);
             panGestureRecognizer.Delegate = this;
@@ -174,8 +174,7 @@ namespace Koloda.DraggableCardView
                 overlay.Alpha = 0;
                 AddSubview(overlay);
                 configureOverlayView();
-                var overlayIndex = Subviews.ToList().IndexOf(overlay); //
-                InsertSubview(view, overlayIndex); //TODO: check it is correct instead of insertSubview(_:aboveSubview:)
+                InsertSubviewBelow(view, overlay);                
             }
             else
             {
@@ -415,9 +414,10 @@ namespace Koloda.DraggableCardView
 
         public CGPoint animationPointForDirection(ESwipeResultDirection direction)
         {
-            // guard let superview = self.superview else {
-            //     return .zero
-            // }
+            if(Superview == null)
+            {
+                return CGPoint.Empty;
+            }
 
             var superSize = Superview.Bounds.Size;
             var space = Math.Max(screenSize.Width, screenSize.Height);
